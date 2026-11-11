@@ -1,0 +1,132 @@
+TECHHAVEN - BONUS FEATURES AND EVIDENCE
+=======================================
+
+All four bonus features of the assignment are implemented (4 x 0.5 = 2 points,
+the maximum).
+
+-------------------------------------------------------------------------------
+1. CI/CD PIPELINE - GitHub Actions
+-------------------------------------------------------------------------------
+File: source/.github/workflows/ci.yml
+
+On every push to "main" and on every pull request:
+  Job "unit"  - npm ci + unit tests of the API (pricing, loyalty points,
+                discount-code rules, input validation, image rules: 15 tests),
+                the mailer (e-mail templates: 3 tests) and the assistant
+                (sentiment analysis, chatbot parsing: 5 tests); checks of the
+                realtime and search services; production build of the React app.
+  Job "e2e"   - validates docker-compose.yml, builds and starts the WHOLE stack
+                with "docker compose up -d --build --wait", waits for the
+                ElasticSearch index, runs tests/e2e-api.mjs (66 end-to-end
+                checks through the Nginx load balancer, including the delivery
+                of the confirmation e-mail to the Mailpit inbox), prints the
+                container logs on failure and tears the stack down.
+
+Local evidence of the same commands:
+  unit-test-output.txt   25/25 unit tests passed
+  e2e-test-output.txt    66 passed, 0 failed
+NOTE: a screenshot of the green run on GitHub ("Actions" tab) must be added by
+the team after pushing the repository (git folder: 04_actions_ci_green.png).
+
+-------------------------------------------------------------------------------
+2. MICROSERVICES ARCHITECTURE WITH ASYNCHRONOUS COMMUNICATION
+-------------------------------------------------------------------------------
+Besides the front end (React/Nginx) and the data stores, the system has FIVE
+Node.js services, each with its own Dockerfile and container
+(see docker-compose-ps.txt):
+
+  api        (x3)  REST API: catalogue, accounts, cart pricing, checkout, admin.
+  realtime   (x2)  Socket.IO server; pushes comments, ratings, sentiment labels
+                   and order status changes to browsers.
+  mailer     (x1)  The only component that talks to SMTP (Mailpit or Gmail).
+  search     (x1)  Owns the ElasticSearch index; indexer + search/suggest API.
+  assistant  (x1)  AI features: chatbot and review sentiment analysis.
+
+Intermediary channels (asynchronous, no service waits for another one):
+  RabbitMQ queue "email.send"                api -> mailer
+  RabbitMQ topic exchange "techhaven.events"
+       product.upserted / product.deleted    api -> search (queue search.index)
+       catalog.snapshot                      api -> search (full re-index)
+       catalog.resync.requested              search -> api (queue api.catalog-resync)
+       comment.created                       api -> assistant (queue assistant.sentiment)
+       comment.sentiment                     assistant -> api (queue api.comment-sentiment)
+       sentiment.backfill.requested          assistant -> api (queue api.sentiment-backfill)
+  Redis pub/sub channel "techhaven:realtime" api -> every realtime replica
+
+Decoupling evidence (scaling-and-resilience.txt):
+  - Stopping the search service: keyword search keeps working through a
+    PostgreSQL fallback ("engine=postgres"), then returns to ElasticSearch.
+  - Stopping one API replica: requests keep being served by the others.
+  - Stopping the assistant service: the shop keeps working (only the chat
+    returns 502 until it is restarted); comments posted meanwhile wait in the
+    RabbitMQ queue and are classified when it comes back.
+  - 60_rabbitmq_queues.png: the durable queues in the RabbitMQ UI.
+  - 11_realtime_comment.png: a comment posted from a second browser appears on
+    the first browser without reloading.
+
+-------------------------------------------------------------------------------
+3. AI FEATURES (assistant service)
+-------------------------------------------------------------------------------
+Code: source/services/assistant
+
+a) Shopping-assistant chatbot (chat bubble at the bottom right of every page)
+   - Understands Vietnamese and English questions: budget ("duoi 30 trieu",
+     "under 8m", "tam 20tr"), product type, intended use (gaming, office,
+     students, design, programming, budget, premium), brand, model numbers
+     ("RTX 4070") and store-policy questions (shipping, warranty, loyalty
+     points, discount codes, payment, order tracking).
+   - Recommends ONLY products that exist in the live catalogue (in stock,
+     within the budget), returned as clickable product cards.
+   - Google Gemini (gemini-3.5-flash-lite through the @google/genai SDK,
+     GEMINI_API_KEY in .env, free key from Google AI Studio) writes the reply
+     from those products in the customer's language, in about 1.5-2 seconds.
+     Gemini only receives the candidate products, the store policies and the
+     last turns of the conversation, so it cannot invent products or prices.
+   - Follow-up questions keep the context: after "laptop gaming duoi 30 trieu",
+     "Co mau nao re hon khong?" searches cheaper gaming laptops in the same
+     budget.
+   - Without a key, or when Gemini fails (invalid key, free-tier quota reached,
+     more than 25 s), the rule-based reply is used; the response field
+     "engine" says gemini or rules. The final E2E run was answered by Gemini.
+   - Evidence: 81_ai_assistant_vi.png, 82_ai_assistant_en.png; end-to-end
+     checks "assistant recommends real laptops within the budget",
+     "assistant finds a specific model", "assistant answers store-policy
+     questions".
+
+b) Sentiment analysis of reviews
+   - Every new comment is sent through RabbitMQ to the assistant, which
+     classifies it as positive / neutral / negative (AFINN English lexicon +
+     a Vietnamese lexicon with negation handling: "khong tot" is negative).
+   - The label is stored, pushed in real time to the product page, and the
+     product page shows "What buyers say": the share of positive, neutral and
+     negative comments.
+   - Evidence: 80_reviews_sentiment.png; end-to-end check "new comments are
+     classified by the sentiment service (RabbitMQ)".
+
+-------------------------------------------------------------------------------
+4. ELASTICSEARCH FOR PRODUCT SEARCH
+-------------------------------------------------------------------------------
+Image: docker.elastic.co/elasticsearch/elasticsearch:8.15.3 (single node).
+Code:  source/services/search/src/index.js
+
+  - Index "products" with an ASCII-folding analyzer and a search_as_you_type
+    sub-field for suggestions.
+  - Exact multi-field matches are boosted; a second typo-tolerant query on
+    names and brands (fuzziness AUTO:5,8) finds "samsng" -> Samsung without
+    turning model numbers such as 4070 into 4060/4080.
+  - Filters (category, brand, price range, rating, in stock, on sale, tag),
+    all sort orders and pagination run inside ElasticSearch.
+  - The index is kept in sync by RabbitMQ events.
+  - Evidence: 06_search_results.png, 07_search_suggest.png.
+
+-------------------------------------------------------------------------------
+HOW TO VERIFY QUICKLY
+-------------------------------------------------------------------------------
+  docker compose up -d
+  docker compose ps                         -> 15 containers
+  docker compose up -d --scale api=5        -> load spread over 5 replicas
+  node tests/scale-demo.mjs 100
+  node tests/e2e-api.mjs
+  docker compose stop search                -> search still answers (fallback)
+  http://localhost:15672                    -> RabbitMQ queues
+  http://localhost:8025                     -> e-mails processed by the mailer

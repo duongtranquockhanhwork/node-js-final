@@ -1,0 +1,16 @@
+SERVICE         NAME                        STATUS
+api             techhaven-api-1             Up 4 minutes (healthy)
+api             techhaven-api-2             Up 4 minutes (healthy)
+api             techhaven-api-3             Up 4 minutes (healthy)
+assistant       techhaven-assistant-1       Up 4 minutes
+elasticsearch   techhaven-elasticsearch-1   Up 4 minutes (healthy)
+frontend        techhaven-frontend-1        Up 4 minutes
+gateway         techhaven-gateway-1         Up 4 minutes
+mailer          techhaven-mailer-1          Up 4 minutes
+mailpit         techhaven-mailpit-1         Up 4 minutes (healthy)
+postgres        techhaven-postgres-1        Up 4 minutes (healthy)
+rabbitmq        techhaven-rabbitmq-1        Up 4 minutes (healthy)
+realtime        techhaven-realtime-1        Up 4 minutes
+realtime        techhaven-realtime-2        Up 4 minutes
+redis           techhaven-redis-1           Up 4 minutes (healthy)
+search          techhaven-search-1          Up 4 minutes

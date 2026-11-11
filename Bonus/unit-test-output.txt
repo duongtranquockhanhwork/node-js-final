@@ -1,0 +1,61 @@
+
+> techhaven-api@1.0.0 test
+> node --test "test/**/*.test.js"
+
+✔ image type is detected from the file signature (0.8964ms)
+✔ a product needs between 1 and 10 images (0.3578ms)
+✔ duplicates are removed and only safe sources are accepted (2.3777ms)
+✔ loyalty: 1,000,000 VND earns 100 points worth 100,000 VND (0.6843ms)
+✔ discount codes are exactly five alphanumeric characters (0.1978ms)
+✔ percent and fixed discounts never exceed the subtotal (0.1401ms)
+✔ quote: tax, shipping fee and total (0.1981ms)
+✔ quote: free shipping above the threshold (1.2225ms)
+✔ quote: points are capped by balance and by the order total (0.1466ms)
+✔ quote: discount is applied before tax (0.8495ms)
+✔ email is normalised and validated (1.7008ms)
+✔ phone accepts 9-15 digits with separators (0.292ms)
+✔ password policy requires letters and digits (0.2976ms)
+✔ slugify handles Vietnamese characters (1.8711ms)
+✔ int enforces bounds and fallback (0.3032ms)
+ℹ tests 15
+ℹ suites 0
+ℹ pass 15
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 83.5114
+
+> techhaven-mailer@1.0.0 test
+> node --test "test/**/*.test.js"
+
+✔ order confirmation lists items, totals and escapes HTML (107.6264ms)
+✔ guest checkout mail contains the set-password link (0.2952ms)
+✔ every template renders (0.2378ms)
+ℹ tests 3
+ℹ suites 0
+ℹ pass 3
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 169.281
+
+> techhaven-assistant@1.0.0 test
+> node --test "test/**/*.test.js"
+
+✔ sentiment: English comments (1.169ms)
+✔ sentiment: Vietnamese comments with negation (0.7515ms)
+✔ budget parsing in both languages (1.271ms)
+✔ intent: category, usage, brand, model, FAQ and language (117.0409ms)
+✔ intent: product words are not read as uses or policy questions (9.0768ms)
+✔ LLM prompt: grounded turns and Gemini conversion (498.9576ms)
+✔ follow-up questions keep the previous request (33.3638ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 7
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 766.4028

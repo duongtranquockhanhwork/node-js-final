@@ -1,0 +1,27 @@
+== Scale-out: docker compose up -d --scale api=5
+techhaven-api-1  Up 8 minutes (healthy)
+techhaven-api-2  Up 8 minutes (healthy)
+techhaven-api-3  Up 8 minutes (healthy)
+techhaven-api-4  Up 31 seconds (healthy)
+techhaven-api-5  Up 31 seconds (healthy)
+100 requests in 187 ms
+  replica 2aa160b6aa8b: 24 requests
+  replica 2d20883e3a2b: 17 requests
+  replica 2e7aae086a73: 18 requests
+  replica 9f415172cdb3: 22 requests
+  replica e4ec64cb7174: 19 requests
+
+== Fault tolerance: stop one API replica during traffic
+60 requests in 2101 ms
+  replica 2aa160b6aa8b: 11 requests
+  replica 2d20883e3a2b: 14 requests
+  replica 2e7aae086a73: 15 requests
+  replica e4ec64cb7174: 20 requests
+
+== Decoupling: stop the search service, keyword search falls back to PostgreSQL
+search running -> engine=elasticsearch, total=11
+search stopped -> engine=postgres, total=4
+search restarted -> engine=elasticsearch, total=11
+
+== Decoupling: stop the assistant service, the shop keeps working
+home: HTTP 200 | chat: HTTP 502

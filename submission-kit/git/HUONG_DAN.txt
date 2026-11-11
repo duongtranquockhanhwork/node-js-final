@@ -1,0 +1,18 @@
+THƯ MỤC "git" - BẰNG CHỨNG LÀM VIỆC NHÓM (bắt buộc theo đề)
+
+Đề yêu cầu ảnh chụp GitHub Insights chứng minh:
+  - dự án kéo dài ít nhất 1 tháng kể từ ngày bắt đầu;
+  - mỗi thành viên có tối thiểu 2 commit mỗi tuần;
+  - phân chia công việc cân bằng.
+
+Cách chụp (sau khi push mã nguồn lên GitHub):
+  1. Repository > Insights > Contributors  (chọn khoảng thời gian toàn bộ dự án)
+  2. Repository > Insights > Commits / Code frequency
+  3. Repository > Insights > Pulse (1 tháng)
+  4. Repository > Actions: lần chạy CI thành công (dùng cho phần Bonus CI/CD)
+
+Lưu các ảnh PNG vào thư mục này với tên rõ ràng, ví dụ:
+  01_contributors.png, 02_commits.png, 03_pulse.png, 04_actions_ci_green.png
+
+Lưu ý: không thể tạo bằng chứng này thay cho nhóm - phải là lịch sử commit thật của các thành viên.
+Xóa file hướng dẫn này trước khi nộp.

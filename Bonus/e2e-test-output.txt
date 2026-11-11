@@ -1,0 +1,70 @@
+E2E against http://localhost:8080
+  PASS requests are served by several API replicas
+  PASS landing page has New, Best Sellers and >= 3 category sections
+  PASS catalogue is paginated
+  PASS sort by name A-Z
+  PASS sort by price high-low
+  PASS filter by brand + price range + rating
+  PASS keyword search uses ElasticSearch
+  PASS search tolerates typos
+  PASS product detail: >= 2 variants, >= 3 images, >= 5 description lines
+  PASS guests can comment
+  PASS guests cannot rate
+  PASS customer can sign in
+  PASS signed-in customer can rate
+  PASS customer has several delivery addresses with a default
+  PASS admin can sign in
+  PASS customer cannot open admin API
+  PASS discount code must be 5 characters
+  PASS usage limit is capped at 10
+  PASS admin creates a code
+  PASS quote shows the discount effect before paying
+  PASS quote applies loyalty points
+  PASS customer checkout succeeds
+  PASS order totals match the quote
+  PASS loyalty: earned = 10% of total in points
+  PASS points spent and earned are applied immediately
+  PASS code is rejected after reaching its usage limit
+  PASS declined card does not create an order
+  PASS order history lists the new order first
+  PASS order detail has status history
+  PASS another user cannot read the order
+  PASS admin order list (today) is newest first
+  PASS invalid status transition is rejected
+  PASS admin moves order to shipping
+  PASS customer sees status history newest first
+  PASS guest checkout succeeds and creates an account
+  PASS auto-created account is linked to the order
+  PASS admin uploads several images at once
+  PASS uploaded image is served with its detected type
+  PASS a file that is not really an image is rejected
+  PASS more than 10 files in one upload is rejected
+  PASS a product must keep at least 1 image
+  PASS a product cannot have more than 10 images
+  PASS saving 10 images keeps their order on the product page
+  PASS on-sale filter returns discounted products, biggest discount first
+  PASS product cards carry key specifications
+  PASS compare / recently viewed: products by slugs with specifications
+  PASS original price must be higher than the selling price
+  PASS wish list needs sign-in
+  PASS customer saves and merges wish-list items
+  PASS customer removes a wish-list item
+  PASS guest tracks an order with its number and e-mail
+  PASS order lookup with a wrong e-mail is refused
+  PASS SEO: robots.txt and sitemap.xml list categories, tags and products
+  PASS assistant recommends real laptops within the budget (Vietnamese)
+  (assistant engine: gemini)
+  PASS assistant finds a specific model (English)
+  PASS assistant answers store-policy questions
+  PASS new comments are classified by the sentiment service (RabbitMQ)
+  PASS product page includes the sentiment summary
+  PASS order confirmation e-mail reaches the guest inbox
+  PASS simple dashboard has users, orders, revenue, best sellers
+  PASS simple dashboard has actionable insights
+  PASS advanced dashboard (year)
+  PASS advanced dashboard (quarter)
+  PASS advanced dashboard (month)
+  PASS advanced dashboard (week)
+  PASS advanced dashboard (custom range)
+
+66 passed, 0 failed
